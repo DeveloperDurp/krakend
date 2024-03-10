@@ -1,0 +1,212 @@
+{
+    "$schema": "https://www.krakend.io/schema/v3.json",
+    "version": 3,
+    "name": "krakend - api gateway",
+    "extra_config": {
+      "security/cors": {
+        "allow_origins": [
+          "*"
+        ],
+        "expose_headers": [
+          "Content-Length"
+        ],
+        "max_age": "12h",
+        "allow_methods": [
+          "GET",
+          "HEAD",
+          "POST",
+          "PUT",
+          "DELETE"
+        ],
+        "allow_credentials": true,
+        "allow_headers": [
+          "Authorization"
+        ]
+      },
+      "telemetry/logging": {
+        "level": "error",
+        "prefix": "[krakend]",
+        "syslog": false,
+        "stdout": true,
+        "format": "default",
+        "syslog_facility": "local3"
+      },
+      "telemetry/metrics": {
+        "collection_time": "60s",
+        "proxy_disabled": false,
+        "router_disabled": false,
+        "backend_disabled": false,
+        "endpoint_disabled": false,
+        "listen_address": ":8090"
+      },
+      "telemetry/opencensus": {
+        "sample_rate": 100,
+        "reporting_period": 1,
+        "exporters": {
+          "logger": {},
+          "prometheus": {
+            "port": 9091
+          }
+        }
+      },
+      "plugin/http-server": {
+        "name": [
+          "static-filesystem"
+        ],
+        "static-filesystem": {
+          "prefix": "/media/assets",
+          "path": "/var/www/static"
+        }
+      }
+    },
+    "timeout": "3000ms",
+    "cache_ttl": "300s",
+    "output_encoding": "json",
+    "endpoints": [
+      {
+        "endpoint": "/jokes/dadjoke",
+        "method": "GET",
+        "output_encoding": "json",
+        "backend": [
+          {
+            "url_pattern": "/api/jokes/dadjoke",
+            "encoding": "json",
+            "sd": "static",
+            "method": "GET",
+            "host": [
+              "http://durpapi-service.durpapi.traefik.mesh"
+            ],
+            "disable_host_sanitize": false
+          }
+        ]
+      },
+      {
+        "endpoint": "/jokes/dadjoke",
+        "method": "POST",
+        "output_encoding": "json",
+        "backend": [
+          {
+            "url_pattern": "/api/jokes/dadjoke",
+            "encoding": "json",
+            "sd": "static",
+            "method": "POST",
+            "host": [
+              "http://durpapi-service.durpapi.traefik.mesh"
+            ],
+            "disable_host_sanitize": false
+          }
+        ],
+        "extra_config": {
+          "auth/validator": {
+            "alg": "RS256",
+            "issuer": "https://authentik.durp.info/application/o/api/",
+            "jwk_url": "https://authentik.durp.info/application/o/api/jwks/",
+            "roles_key_is_nested": false,
+            "roles_key": "groups",
+            "roles": [
+              "rw-jokes"
+            ],
+            "cache": true
+          }
+        }
+      },
+      {
+        "endpoint": "/jokes/dadjoke",
+        "method": "DELETE",
+        "output_encoding": "json",
+        "backend": [
+          {
+            "url_pattern": "/api/jokes/dadjoke",
+            "encoding": "json",
+            "sd": "static",
+            "method": "DELETE",
+            "host": [
+              "http://durpapi-service.durpapi.traefik.mesh"
+            ],
+            "disable_host_sanitize": false
+          }
+        ],
+        "extra_config": {
+          "auth/validator": {
+            "alg": "RS256",
+            "issuer": "https://authentik.durp.info/application/o/api/",
+            "jwk_url": "https://authentik.durp.info/application/o/api/jwks/",
+            "roles_key_is_nested": false,
+            "roles_key": "groups",
+            "roles": [
+              "rw-jokes"
+            ],
+            "cache": true
+          }
+        }
+      },
+      {
+        "endpoint": "/openai/general",
+        "method": "GET",
+        "output_encoding": "json",
+        "timeout": "1m",
+        "backend": [
+          {
+            "url_pattern": "/api/openai/general",
+            "encoding": "json",
+            "sd": "static",
+            "method": "GET",
+            "host": [
+              "http://durpapi-service.durpapi.traefik.mesh"
+            ],
+            "disable_host_sanitize": false
+          }
+        ],
+        "extra_config": {
+          "auth/validator": {
+            "alg": "RS256",
+            "issuer": "https://authentik.durp.info/application/o/api/",
+            "jwk_url": "https://authentik.durp.info/application/o/api/jwks/",
+            "roles_key_is_nested": false,
+            "roles_key": "groups",
+            "roles": [
+              "openai"
+            ],
+            "cache": true
+          }
+        }
+      },
+      {
+        "endpoint": "/unraid/powerusage",
+        "method": "GET",
+        "output_encoding": "json",
+        "timeout": "1m",
+        "backend": [
+          {
+            "url_pattern": "/api/unraid/powerusage",
+            "encoding": "json",
+            "sd": "static",
+            "method": "GET",
+            "host": [
+              "http://durpapi-service.durpapi.traefik.mesh"
+            ],
+            "disable_host_sanitize": false
+          }
+        ],
+        "extra_config": {
+          "auth/validator": {
+            "alg": "RS256",
+            "issuer": "https://authentik.durp.info/application/o/api/",
+            "jwk_url": "https://authentik.durp.info/application/o/api/jwks/",
+            "roles_key_is_nested": false,
+            "roles_key": "groups",
+            "roles": [
+              "unraid"
+            ],
+            "cache": true
+          }
+        }
+      }
+  
+    ],
+    "plugin": {
+      "pattern": ".so",
+      "folder": "/opt/krakend/plugins/"
+    }
+  }
+  
